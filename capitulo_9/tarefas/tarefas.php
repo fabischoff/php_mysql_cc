@@ -4,6 +4,8 @@ session_start();
 
 require './banco.php';
 require './ajudantes.php';
+
+$exibir_tabela = TRUE;
 //var_dump($_GET);die;
 
 if (array_key_exists('nome', $_GET) && $_GET['nome'] != '') {
@@ -13,15 +15,13 @@ if (array_key_exists('nome', $_GET) && $_GET['nome'] != '') {
 
     if (array_key_exists('descricao', $_GET)) {
         $tarefa['descricao'] = $_GET['descricao'];
-    }
-    else {
+    } else {
         $tarefa['descricao'] = '';
     }
 
     if (array_key_exists('prazo', $_GET)) {
         $tarefa['prazo'] = $_GET['prazo'];
-    }
-    else {
+    } else {
         $tarefa['prazo'] = '';
     }
 
@@ -29,18 +29,16 @@ if (array_key_exists('nome', $_GET) && $_GET['nome'] != '') {
 
     if (array_key_exists('concluida', $_GET)) {
         $tarefa['concluida'] = 1;
-    }
-    else {
+    } else {
         $tarefa['concluida'] = 0;
     }
 
     if (array_key_exists('prazo', $_GET) && $_GET['prazo'] != '') {
         $tarefa['prazo'] = traduz_data_para_banco($_GET['prazo']);
-    }
-    else {
+    } else {
         $tarefa['prazo'] = NULL;
     }
-    
+
 
     gravar_tarefa($conexao, $tarefa);
 }
@@ -50,4 +48,14 @@ $lista_tarefas = [];
 $lista_tarefas = buscar_tarefas($conexao);
 
 //var_dump($lista_tarefas);die;
+
+$tarefa = [
+    'id' => 0,
+    'nome' => '',
+    'descricao' => '',
+    'prazo' => '',
+    'prioridade' => 1,
+    'concluida' => '',
+    'id' => '',
+];
 require './template.php';

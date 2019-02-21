@@ -2,26 +2,26 @@
 
 session_start();
 
-require './banco.php';
-require './ajudantes.php';
-//var_dump($_GET);die;
+require "./banco.php";
+require "./ajudantes.php";
+
+$exibir_tabela = FALSE;
 
 if (array_key_exists('nome', $_GET) && $_GET['nome'] != '') {
 
     $tarefa = [];
+    $tarefa['id'] = $_GET['id'];
     $tarefa['nome'] = $_GET['nome'];
 
     if (array_key_exists('descricao', $_GET)) {
         $tarefa['descricao'] = $_GET['descricao'];
-    }
-    else {
+    } else {
         $tarefa['descricao'] = '';
     }
 
     if (array_key_exists('prazo', $_GET)) {
         $tarefa['prazo'] = $_GET['prazo'];
-    }
-    else {
+    } else {
         $tarefa['prazo'] = '';
     }
 
@@ -29,25 +29,26 @@ if (array_key_exists('nome', $_GET) && $_GET['nome'] != '') {
 
     if (array_key_exists('concluida', $_GET)) {
         $tarefa['concluida'] = 1;
-    }
-    else {
+    } else {
         $tarefa['concluida'] = 0;
     }
 
     if (array_key_exists('prazo', $_GET) && $_GET['prazo'] != '') {
         $tarefa['prazo'] = traduz_data_para_banco($_GET['prazo']);
-    }
-    else {
+    } else {
         $tarefa['prazo'] = NULL;
     }
-    
 
-    gravar_tarefa($conexao, $tarefa);
+
+    editar_tarefa($conexao, $tarefa);
+    
+    header('Location:tarefas.php');die;
+    
 }
 
-$lista_tarefas = [];
+$tarefa = buscar_tarefa($conexao, $_GET['id']);
+//var_dump($tarefa);die;
 
-$lista_tarefas = buscar_tarefas($conexao);
+require "template.php";
 
-//var_dump($lista_tarefas);die;
-require './template.php';
+
