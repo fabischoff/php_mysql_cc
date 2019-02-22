@@ -29,6 +29,8 @@ function traduz_data_para_banco($data) {
 }
 
 function traduz_data_para_exibir($data) {
+    
+//    echo $data;die;
 
     if ($data == "" or $data == "0000-00-00") {
         return "";

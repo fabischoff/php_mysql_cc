@@ -5,13 +5,26 @@ session_start();
 require "./banco.php";
 require "./ajudantes.php";
 
-$exibir_tabela = FALSE;
 
-if (array_key_exists('nome', $_POST) && $_POST['nome'] != '') {
+
+$exibir_tabela = FALSE;
+$tem_erros = FALSE;
+$erros_validacao = [];
+
+if (tem_post()) {
 
     $tarefa = [];
     $tarefa['id'] = $_POST['id'];
-    $tarefa['nome'] = $_POST['nome'];
+
+
+    if (array_key_exists('nome', $_POST) && strlen($_POST['nome']) > 0) {
+        $tarefa['nome'] = $_POST['nome'];
+    } else {
+        $tem_erros = TRUE;
+        $erros_validacao['nome'] = 'O nome da tarefa é obrigatório!';
+       
+    }
+
 
     if (array_key_exists('descricao', $_POST)) {
         $tarefa['descricao'] = $_POST['descricao'];
@@ -19,8 +32,13 @@ if (array_key_exists('nome', $_POST) && $_POST['nome'] != '') {
         $tarefa['descricao'] = '';
     }
 
-    if (array_key_exists('prazo', $_POST)) {
-        $tarefa['prazo'] = $_POST['prazo'];
+    if (array_key_exists('prazo', $_POST) && strlen($_POST['prazo']) > 0) {
+        if (validar_data($_POST['prazo'])) {
+            $tarefa['prazo'] = traduz_data_para_banco($_POST['prazo']);
+        } else {
+            $tem_erros = TRUE;
+            $erros_validacao['prazo'] = 'O prazo não é uma data válida!';
+        }
     } else {
         $tarefa['prazo'] = '';
     }
@@ -33,21 +51,28 @@ if (array_key_exists('nome', $_POST) && $_POST['nome'] != '') {
         $tarefa['concluida'] = 0;
     }
 
-    if (array_key_exists('prazo', $_POST) && $_POST['prazo'] != '') {
-        $tarefa['prazo'] = traduz_data_para_banco($_POST['prazo']);
-    } else {
-        $tarefa['prazo'] = NULL;
+   
+
+    if (!$tem_erros) {
+
+        editar_tarefa($conexao, $tarefa);
+        header('Location:tarefas.php');
+        die;
     }
-
-
-    editar_tarefa($conexao, $tarefa);
-    
-    header('Location:tarefas.php');die;
-    
 }
 
-$tarefa = buscar_tarefa($conexao, $_POST['id']);
+$tarefa = buscar_tarefa($conexao, $_GET['id']);
+
+//var_dump($tarefa);
+
+$tarefa['nome'] = (array_key_exists('nome', $_POST)) ? $_POST['nome'] : $tarefa['nome'];
+$tarefa['descricao'] = (array_key_exists('descricao', $_POST)) ? $_POST['descricao'] : $tarefa['descricao'];
+$tarefa['prazo'] = (array_key_exists('prazo', $_POST)) ? $_POST['prazo'] : $tarefa['prazo'];
+$tarefa['prioridade'] = (array_key_exists('prioridade', $_POST)) ? $_POST['prioridade'] : $tarefa['prioridade'];
+$tarefa['concluida'] = (array_key_exists('concluida', $_POST)) ? $_POST['concluida'] : $tarefa['concluida'];
+
 //var_dump($tarefa);die;
+
 
 require "template.php";
 

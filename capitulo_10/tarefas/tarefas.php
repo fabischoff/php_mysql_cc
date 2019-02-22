@@ -30,8 +30,13 @@ if (tem_post()) {
         $tarefa['descricao'] = '';
     }
 
-    if (array_key_exists('prazo', $_POST)) {
-        $tarefa['prazo'] = $_POST['prazo'];
+    if (array_key_exists('prazo', $_POST) && strlen($_POST['prazo']) > 0) {
+        if (validar_data($_POST['prazo'])) {
+            $tarefa['prazo'] = traduz_data_para_banco($_POST['prazo']);
+        } else {
+            $tem_erros = TRUE;
+            $erros_validacao['prazo'] = 'O prazo não é uma data válida!';
+        }
     } else {
         $tarefa['prazo'] = '';
     }
@@ -44,20 +49,15 @@ if (tem_post()) {
         $tarefa['concluida'] = 0;
     }
 
-    if (array_key_exists('prazo', $_POST) && $_POST['prazo'] != '') {
-        $tarefa['prazo'] = traduz_data_para_banco($_POST['prazo']);
-    } else {
-        $tarefa['prazo'] = NULL;
-    }
+
 
     if (!$tem_erros) {
 
         gravar_tarefa($conexao, $tarefa);
-        header('Location:tarefa.php');
+        header('Location:tarefas.php');
         die();
     }
 }
-
 
 $lista_tarefas = [];
 
@@ -69,9 +69,9 @@ $tarefa = [
     'id' => 0,
     'nome' => (array_key_exists('nome', $_POST)) ? $_POST['nome'] : '',
     'descricao' => (array_key_exists('descricao', $_POST)) ? $_POST['descricao'] : '',
-    'prazo' => (array_key_exists('prazo', $_POST)) ? traduz_data_para_banco($_POST['prazo']) : '',
+    'prazo' => (array_key_exists('prazo', $_POST) && $_POST['prazo'] != '') ? traduz_data_para_banco($_POST['prazo']) : '',
     'prioridade' => (array_key_exists('prioridade', $_POST)) ? $_POST['prioridade'] : 1,
-    'concluida' => (array_key_exists('concluida', $_POST)) ? $_POST['concluida'] :'',
+    'concluida' => (array_key_exists('concluida', $_POST)) ? $_POST['concluida'] : '',
     'id' => '',
 ];
 require './template.php';

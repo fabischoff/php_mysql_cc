@@ -20,9 +20,16 @@ function traduz_prioridade($codigo) {
 }
 
 function traduz_data_para_banco($data) {
-
+    if ($data == "") {
+        return "";
+    }
 
     $dados = explode('/', $data);
+
+    if (count($dados) != 3) {
+        return $data;
+    }
+
     $data_banco = "{$dados[2]}-{$dados[1]}-{$dados[0]}";
 
     return $data_banco;
@@ -35,6 +42,10 @@ function traduz_data_para_exibir($data) {
     }
 
     $dados = explode("-", $data);
+
+    if (count($dados) != 3) {
+        return $data;
+    }
     return $data_exibir = "{$dados[2]}/{$dados[1]}/{$dados[0]}";
 }
 
@@ -44,9 +55,25 @@ function traduz_concluida($concluida) {
 }
 
 function tem_post() {
-    if(count($_POST) >0 ){
+    if (count($_POST) > 0) {
         return TRUE;
-        
     }
     return FALSE;
+}
+
+function validar_data($data) {
+
+    $padrao = '/^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$/';
+    $resultado = preg_match($padrao, $data);
+
+    if ($resultado == 0) {
+        return FALSE;
+    }
+
+    $dados = explode('/', $data);
+//    var_dump($dados);die;
+
+    $resultado = checkdate($dados[1], $dados[0], $dados[2]);
+
+    return $resultado;
 }
